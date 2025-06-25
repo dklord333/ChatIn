@@ -1,0 +1,49 @@
+{
+  "project_info": {
+    "project_number": "15237221159",
+    "firebase_url": "https://chatdailyy-default-rtdb.firebaseio.com",
+    "project_id": "chatdailyy",
+    "storage_bucket": "chatdailyy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15237221159:android:de577ee8d0878f5c137702",
+        "android_client_info": {
+          "package_name": "com.example.chatdaily"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt7NA9BjUPACpBzdwOyqri1Fm3goVo8oI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:15237221159:android:b032a1357c4f0213137702",
+        "android_client_info": {
+          "package_name": "com.example.chatin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBt7NA9BjUPACpBzdwOyqri1Fm3goVo8oI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
