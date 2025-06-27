@@ -1,7 +1,9 @@
 import androidx.lifecycle.ViewModel
 import com.example.chatin.ModelClass.UserModel
+import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,6 +19,7 @@ class AuthViewModel : ViewModel() {
                 if (it.isSuccessful) {
                     _user.value = auth.currentUser
                     onResult(true, null)
+                    Firebase.analytics.logEvent("login_success", null)
 
                 } else {
                     onResult(false, it.exception?.message)
