@@ -1,9 +1,9 @@
 package com.example.chatin.ModelClass
 
 data class UserModel(
-    val id:String,
-    val name:String,
-    val phNo:String,
-    val email:String,
-    val password:String,
+    val userEmail:String="",
+    val userName:String="",
+    val userid:String="",
+    val userpass:String="",
+
 )

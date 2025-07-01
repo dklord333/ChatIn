@@ -577,11 +577,10 @@ class Login : ComponentActivity() {
                         .width(ScreenWidth * 0.67f)
                         .height(ScreenHeight * 0.08f).clickable {
                             val credentials = UserModel(
-                                email = textmail,
-                                password = textpass,
-                                name = textname,
-                                phNo = textphone,
-                                id = ""
+                                userEmail = textmail,
+                                userpass = textpass,
+                                userName = textname,
+                                userid = ""
                             )
 
                             authViewModel.register(credentials) { success, error ->

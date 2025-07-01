@@ -29,7 +29,7 @@ class AuthViewModel : ViewModel() {
 
 
     fun register(credentials: UserModel, onResult: (Boolean, String?) -> Unit) {
-        auth.createUserWithEmailAndPassword(credentials.email, credentials.password)
+        auth.createUserWithEmailAndPassword(credentials.userEmail, credentials.userpass)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     _user.value = auth.currentUser

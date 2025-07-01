@@ -3,13 +3,14 @@ package com.example.chatin.Repository
 import android.util.Log
 import com.example.chatin.ModelClass.UserModel
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 
 class UserRepository {
     val auth = FirebaseAuth.getInstance()
-    val db = FirebaseFirestore.getInstance()
+    val db = FirebaseDatabase.getInstance()
     fun adduser(user: UserModel, onSucess: () -> Unit, onFailure: (Exception) -> Unit) {
-        db.collection("users").document(user.id).set(user).addOnSuccessListener {
+        db.getReference("Users").child(user.userid).setValue(user).addOnSuccessListener {
             Log.d(
                 "TAG",
                 "Useradded: "
@@ -22,27 +23,37 @@ class UserRepository {
         }
     }
 
-    fun fetchuser(onResult: (List<UserModel>)->Unit){
-        db.collection("users").get().addOnSuccessListener {snapshot->
-                val users=snapshot.toObjects(UserModel::class.java)
-            onResult(users)
-
-        }
-    }
-
-    fun getUserById(uid: String, onResult: (UserModel?) -> Unit) {
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { doc ->
-                if (doc.exists()) {
-                    val user = doc.toObject(UserModel::class.java)
-                    onResult(user)
-                } else {
-                    onResult(null) // User not found
+    fun fetchuser(currentUserId: String, onResult: (List<UserModel>) -> Unit) {
+        db.getReference("Users")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                val users = snapshot.children.mapNotNull { it.getValue(UserModel::class.java) }
+                val filtered_users = users.filter { it.userid != currentUserId }
+                Log.d("UserListDebug", "Fetched ${users.size} users")
+                onResult(filtered_users)
+                Log.d("FilteredUserList", "Fetched ${filtered_users.size} users")
+                users.forEach { user ->
+                    Log.d("UserFetch", "User: ${user.userName}, ID: ${user.userid}")
                 }
-            }
-            .addOnFailureListener {
-                onResult(null)
+            }.addOnFailureListener {
+                Log.e("UserListDebug", "Error fetching users", it)
             }
     }
+
+//    fun getUserById(uid: String, onResult: (UserModel?) -> Unit) {
+//        db.collection("users").document(uid).get()
+//            .addOnSuccessListener { doc ->
+//                if (doc.exists()) {
+//                    val user = doc.toObject(UserModel::class.java)
+//                    onResult(user)
+//                } else {
+//                    onResult(null) // User not found
+//                }
+//            }
+//            .addOnFailureListener {
+//                onResult(null)
+//            }
+
+
 
 }

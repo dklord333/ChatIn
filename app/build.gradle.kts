@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.androidx.compose.navigation)
     implementation(libs.androidx.foundation.android)
     implementation(libs.firebase.messaging)
+    implementation(libs.firebase.database.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
