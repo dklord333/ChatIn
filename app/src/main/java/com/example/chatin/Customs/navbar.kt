@@ -71,10 +71,14 @@ fun navbar(navController: NavController){
                         if (item.route != currentroute) {
                             navController.navigate(item.route) {
                                 popUpTo(navController.graph.startDestinationId) {
-                                    saveState = true
+                                    inclusive = false
+                                    saveState = false
                                 }
-                                launchSingleTop = false
-                                restoreState = true
+                                popUpTo(item.route) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                                restoreState = false
                             }
                         }
                     }
