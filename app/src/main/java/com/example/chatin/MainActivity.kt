@@ -93,8 +93,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-
-
 fun ChatList(
     chats: List<Chat>, context: Context,
         padding:PaddingValues= PaddingValues()

@@ -1,4 +1,5 @@
 package com.example.chatin
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -65,9 +66,14 @@ class Home : ComponentActivity() {
                         modifier = Modifier.padding(innerPadding)
                     ) {
                         composable("home") { HomeScreen() } // Using the HomeScreen composable
-                        composable("profile") { backStackEntry ->UserListScreen(viewModel = UVM,navController) }
+                        composable("profile") {
+
+                            UserListScreen(viewModel = UVM,navController) }
                         composable("settings") { SettingsScreen()}
-                            composable("Chat") { chat(viewModel = vm)
+                            composable("Chat/{userId}/{userName}") { backStackEntry ->
+                                val userId=backStackEntry.arguments?.getString("userId")?:""
+                                val userName=backStackEntry.arguments?.getString("userName")?:""
+                                chat(viewModel = vm,userid=userId,username=userName)
                             }
 
                     }
@@ -91,18 +97,29 @@ fun SettingsScreen() {
         Text("Settings", color = Color.Black)
     }
 }
+@SuppressLint("ViewModelConstructorInComposable")
 @Composable
 fun UserListScreen(viewModel: UserList,navController: NavController) {
-    val users by viewModel.users.collectAsState()
+
+    var selectedUser by remember { mutableStateOf<Pair<String, String>?>(null)  }
+    if (selectedUser==null){
+        val users by viewModel.users.collectAsState()
 
     if (users.isEmpty()) {
         Text("No users found", color = Color.Red)
     } else {
         LazyColumn {
             items(users) { user ->
+                val userid=user.userid
+                val username=user.userName
+                var vm=PositionVM()
                 Box(
                     modifier = Modifier.fillMaxWidth().padding(8.dp).background(Color.Blue,
-                        RectangleShape).clickable {   navController.navigate("Chat")}
+                        RectangleShape).clickable {  /*"Chat/${user.userid}/${user.userName}"*/
+
+                        selectedUser = user.userid to username
+
+                        }
                 ) {
                     Text(text = user.userName, fontSize = 20.sp, color = Color.White)
                 }
@@ -110,6 +127,11 @@ fun UserListScreen(viewModel: UserList,navController: NavController) {
 
     }
 }}
+else{
+     val(userid,username)=selectedUser!!
+    chat(viewModel = PositionVM(),userid,username)
+}
+}
 
 
 

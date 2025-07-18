@@ -13,10 +13,8 @@
 
     <!-- Fixes the warning -->
     <uses-feature android:name="android.hardware.telephony" android:required="false" />
-
-
-
     <application
+
 
 
         android:allowBackup="true"
@@ -69,6 +67,10 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
+
+
+
     </application>
 
 </manifest>

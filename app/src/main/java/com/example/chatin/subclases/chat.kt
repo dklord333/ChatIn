@@ -9,7 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
+
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +23,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
@@ -46,18 +51,24 @@ import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.chatin.Animation.Bordeanimation
 import com.example.chatin.R
+import com.example.chatin.Repository.Message
 import com.example.chatin.ViewModel.PositionVM
 import com.example.chatin.ui.theme.ChatInTheme
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import com.example.chatin.Customs.AttachPopup as AttachPopup
 
 @Composable
-fun chat ( viewModel: PositionVM
+fun chat ( viewModel: PositionVM ,userid:String,username:String
 ) {
+val name=username
     var showpopup by remember {
         mutableStateOf(false)
     }
@@ -73,19 +84,36 @@ fun chat ( viewModel: PositionVM
         mutableStateOf( "")
     }
 
-    Column (modifier = Modifier
-    .fillMaxSize(),
-
-    verticalArrangement = Arrangement.Bottom
+    Column (
 
 
     ){
+        val config = LocalConfiguration.current
+        val ScreenWidth = config.screenWidthDp.dp
+        val ScreenHeight = config.screenHeightDp.dp
+Row (
+    horizontalArrangement = Arrangement.Center,
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = Modifier.fillMaxWidth().height(36.dp)
+.background(Color.Blue)
 
+
+){
+    Text(text = name, color = Color.White, fontSize = 20.sp)
+
+}
+Column(
+    modifier = Modifier
+        .fillMaxWidth().weight(1f),
+) {
+    sendmessage("hello everyone")
+
+}
         Row(
             verticalAlignment = Alignment.CenterVertically,
 
             modifier = Modifier
-                .background(Color.LightGray, RoundedCornerShape(16.dp))
+                .background(Color.White, RoundedCornerShape(16.dp))
                 .clip(
                     RoundedCornerShape(16.dp)
                 )
@@ -94,7 +122,7 @@ fun chat ( viewModel: PositionVM
 
 
         ) {
-            TextField( modifier= Modifier.width(width = screenWidth*0.8f),
+            TextField( modifier= Modifier.width(ScreenWidth*0.75f).background(Color.White),
                 value = text, onValueChange = { newtext ->
                     text = newtext
                 },
@@ -141,3 +169,34 @@ fun chat ( viewModel: PositionVM
 
 
             }}}
+@Composable
+fun sendmessage(text:String,){
+
+    Box(modifier = Modifier.wrapContentWidth().wrapContentHeight().background(Color.LightGray,
+        RoundedCornerShape(8.dp)
+    )){
+
+
+        Text(text= text,
+
+            fontSize = 24.sp
+
+        )
+
+
+    }
+}
+@Preview(showBackground = true)
+@Composable
+fun previewchat() {
+    val Username="Hai"
+    val Userid="Hai"
+     val vm=PositionVM()
+chat(viewModel = vm,Userid,Username)
+
+}
+@Preview(showBackground = true)
+@Composable
+fun prev(){
+    sendmessage("ali ...where r u")
+}
