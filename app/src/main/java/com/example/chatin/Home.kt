@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.chatin.Customs.navbar
+import com.example.chatin.ViewModel.ChatViewModel
 import com.example.chatin.ViewModel.PositionVM
 import com.example.chatin.subclases.chat
 import com.google.firebase.auth.FirebaseAuth
@@ -42,6 +43,7 @@ class Home : ComponentActivity() {
         val auth= FirebaseAuth.getInstance().currentUser?.uid
         super.onCreate(savedInstanceState)
         var vm=PositionVM()
+        var cvm=ChatViewModel()
         var UVM=UserList(auth.toString())
         setContent {
             val navController = rememberNavController()
@@ -73,7 +75,7 @@ class Home : ComponentActivity() {
                             composable("Chat/{userId}/{userName}") { backStackEntry ->
                                 val userId=backStackEntry.arguments?.getString("userId")?:""
                                 val userName=backStackEntry.arguments?.getString("userName")?:""
-                                chat(viewModel = vm,userid=userId,username=userName)
+                                chat(viewModel = vm,userid=userId,username=userName,receiverid=userId,ChatVM=cvm)
                             }
 
                     }
@@ -129,7 +131,7 @@ fun UserListScreen(viewModel: UserList,navController: NavController) {
 }}
 else{
      val(userid,username)=selectedUser!!
-    chat(viewModel = PositionVM(),userid,username)
+    chat(viewModel = PositionVM(), username = username, receiverid = userid, userid = userid, ChatVM = ChatViewModel())
 }
 }
 

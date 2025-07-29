@@ -1,10 +1,7 @@
 package com.example.chatin.subclases
 
-import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,27 +10,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.BottomAppBarDefaults.ContentPadding
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,30 +37,24 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Black
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.chatin.Animation.Bordeanimation
 import com.example.chatin.R
-import com.example.chatin.Repository.Message
+import com.example.chatin.ViewModel.ChatViewModel
 import com.example.chatin.ViewModel.PositionVM
-import com.example.chatin.ui.theme.ChatInTheme
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import com.google.firebase.auth.FirebaseAuth
 import com.example.chatin.Customs.AttachPopup as AttachPopup
 
 @Composable
-fun chat ( viewModel: PositionVM ,userid:String,username:String
+fun chat ( viewModel: PositionVM ,userid:String,username:String,receiverid:String,ChatVM:ChatViewModel
 ) {
+    val messages by ChatVM.messages.collectAsState()
 val name=username
     var showpopup by remember {
         mutableStateOf(false)
@@ -83,6 +70,9 @@ val name=username
     var text by remember {
         mutableStateOf( "")
     }
+    LaunchedEffect(Unit) {
+        ChatVM.startListening(receiverid)
+    }
 
     Column (
 
@@ -94,8 +84,10 @@ val name=username
 Row (
     horizontalArrangement = Arrangement.Center,
     verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier.fillMaxWidth().height(36.dp)
-.background(Color.Blue)
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(36.dp)
+        .background(Color.Blue)
 
 
 ){
@@ -104,11 +96,27 @@ Row (
 }
 Column(
     modifier = Modifier
-        .fillMaxWidth().weight(1f),
+        .fillMaxWidth()
+        .weight(1f),
 ) {
-    sendmessage("hello everyone")
+   LazyColumn {
+       items(messages){
+           msg->
+          val curuserId=FirebaseAuth.getInstance().currentUser?.uid
+           val is_sender=msg.senderId==FirebaseAuth.getInstance().currentUser?.uid
+           Log.d("SenderId", "Sender: $curuserId")
+           if(msg.senderId == curuserId){
+               sendmessage(msg.message)
+           }else{
+               Receivemessage(msg.message)
 
+           }
+
+       }
+   }
 }
+
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
 
@@ -122,7 +130,9 @@ Column(
 
 
         ) {
-            TextField( modifier= Modifier.width(ScreenWidth*0.75f).background(Color.White),
+            TextField( modifier= Modifier
+                .width(ScreenWidth * 0.75f)
+                .background(Color.White),
                 value = text, onValueChange = { newtext ->
                     text = newtext
                 },
@@ -144,7 +154,7 @@ Column(
                         .size(38.dp)
                         .onGloballyPositioned { LayoutCoordinates ->
                             var position = LayoutCoordinates.positionInRoot()
-                            viewModel.buttonOffset.value=position
+                            viewModel.buttonOffset.value = position
 
                         }
                         .clickable { showpopup = true })
@@ -160,9 +170,13 @@ Column(
 
                     })
                 Icon(
+
                     painter = painterResource(id = R.drawable.sendicon),
                     contentDescription = "send",
-                    modifier = Modifier.size(44.dp)
+                    modifier = Modifier.size(44.dp).clickable { if (text.isNotBlank()) {
+                        ChatVM.sendMessage(receiverid, text)
+                        text = ""
+                    } }
                 )
 
             }
@@ -172,29 +186,74 @@ Column(
 @Composable
 fun sendmessage(text:String,){
 
-    Box(modifier = Modifier.wrapContentWidth().wrapContentHeight().background(Color.LightGray,
-        RoundedCornerShape(8.dp)
-    )){
+    Row (
+        modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp),
+        Arrangement.End
+    ){
+        Box(
+            modifier = Modifier
+                .wrapContentWidth()
+                .wrapContentHeight()
+                .background(
+                    Color(0xFFFF9800),
+                    RoundedCornerShape(8.dp)
+                )
+        ) {
 
 
-        Text(text= text,
 
-            fontSize = 24.sp
+            Text(
+                text = "   $text ",
 
-        )
+                fontSize = 20.sp
+
+            )
 
 
+        }
+    }
+}
+@Composable
+fun Receivemessage(text:String,){
+
+    Row (
+        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+        Arrangement.Start
+    ){
+        Box(
+            modifier = Modifier
+                .wrapContentWidth()
+                .padding(vertical = 2.dp)
+                .wrapContentHeight()
+                .background(
+                    Color(0xFFFAB01D),
+                    RoundedCornerShape(8.dp)
+                )
+        ) {
+
+
+            Text(
+                text ="   $text ",
+
+                fontSize = 20.sp
+
+            )
+
+
+        }
     }
 }
 @Preview(showBackground = true)
-@Composable
-fun previewchat() {
-    val Username="Hai"
-    val Userid="Hai"
-     val vm=PositionVM()
-chat(viewModel = vm,Userid,Username)
-
-}
+//@Composable
+//fun previewchat() {
+//    val Username="Hai"
+//    val Userid="Hai"
+//    val rec="sd"
+//    val cvm=ChatViewModel()
+//     val vm=PositionVM()
+//chat(viewModel = vm,Userid,Username,rec,cvm)
+//
+//}
 @Preview(showBackground = true)
 @Composable
 fun prev(){
